@@ -13,11 +13,6 @@ const manifest: ManifestV3Export = {
     type: 'module',
   },
   host_permissions: ['<all_urls>'],
-  content_scripts: [
-    {
-      matches: ['<all_urls>'],
-    },
-  ],
   optional_permissions: ['topSites'],
 } as const;
 
