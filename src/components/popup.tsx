@@ -21,23 +21,18 @@ export default function Popup() {
 
   // Timer logic remains the same
   useEffect(() => {
-    let interval: NodeJS.Timeout
+    let interval: NodeJS.Timeout;
     if (timerRunning && timeRemaining > 0) {
       interval = setInterval(() => {
-        setTimeRemaining((prevTime) => prevTime - 1)
-      }, 1000)
-    } else if (timeRemaining === 0) {
-      setTimerRunning(false)
-      setTimerStarted(false)
     }
-    return () => clearInterval(interval)
-  }, [timerRunning, timeRemaining])
+    return () => clearInterval(interval);
+  }, [timerRunning, timeRemaining]);
 
   const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`
-  }
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   const startTimer = () => {
     setTimerStarted(true)
@@ -162,7 +157,6 @@ export default function Popup() {
               </div>
             </motion.div>
           )}
-
           {activeTab === "tasks" && (
             <motion.div
               key="tasks"
@@ -220,4 +214,3 @@ export default function Popup() {
     </motion.div>
   )
 }
-
