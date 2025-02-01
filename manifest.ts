@@ -7,13 +7,12 @@ const manifest: ManifestV3Export = {
   action: {
     default_popup: 'index.html',
   },
-  permissions: ['storage'],
+  permissions: ['storage', 'tabs', 'webNavigation', 'alarms', 'idle'],
   background: {
     service_worker: 'src/background/service-worker.ts',
     type: 'module',
   },
   host_permissions: ['<all_urls>'],
-  optional_permissions: ['topSites'],
 } as const;
 
 export default manifest;
