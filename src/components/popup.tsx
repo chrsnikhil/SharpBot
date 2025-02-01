@@ -1,29 +1,43 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Clock10, BarChart2, List, Settings, Play, Pause, RotateCcw, Plus } from "lucide-react"
-import { Button } from "./ui/button"
-import { Progress } from "./ui/progress"
-import { Switch } from "./ui/switch"
-import { Checkbox } from "./ui/checkbox"
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Clock10,
+  BarChart2,
+  List,
+  Settings,
+  Play,
+  Pause,
+  RotateCcw,
+  Plus,
+} from 'lucide-react';
+import { Button } from './ui/button';
+import { Progress } from './ui/progress';
+import { Switch } from './ui/switch';
+import { Checkbox } from './ui/checkbox';
 
 export default function Popup() {
-  const [activeTab, setActiveTab] = useState("timer")
-  const [timerRunning, setTimerRunning] = useState(false)
-  const [timeRemaining, setTimeRemaining] = useState(25 * 60)
-  const [timerStarted, setTimerStarted] = useState(false)
+  const [activeTab, setActiveTab] = useState('timer');
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(25 * 60);
+  const [timerStarted, setTimerStarted] = useState(false);
   const [tasks, setTasks] = useState([
-    { id: 1, text: "Complete project proposal", completed: false },
-    { id: 2, text: "Review documentation", completed: true },
-    { id: 3, text: "Team meeting prep", completed: false },
-  ])
+    { id: 1, text: 'Complete project proposal', completed: false },
+    { id: 2, text: 'Review documentation', completed: true },
+    { id: 3, text: 'Team meeting prep', completed: false },
+  ]);
 
   // Timer logic remains the same
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (timerRunning && timeRemaining > 0) {
       interval = setInterval(() => {
+        setTimeRemaining(prevTime => prevTime - 1);
+      }, 1000);
+    } else if (timeRemaining === 0) {
+      setTimerRunning(false);
+      setTimerStarted(false);
     }
     return () => clearInterval(interval);
   }, [timerRunning, timeRemaining]);
@@ -35,25 +49,29 @@ export default function Popup() {
   };
 
   const startTimer = () => {
-    setTimerStarted(true)
-    setTimerRunning(true)
-  }
+    setTimerStarted(true);
+    setTimerRunning(true);
+  };
 
   const resetTimer = () => {
-    setTimerRunning(false)
-    setTimerStarted(false)
-    setTimeRemaining(25 * 60)
-  }
+    setTimerRunning(false);
+    setTimerStarted(false);
+    setTimeRemaining(25 * 60);
+  };
 
   const toggleTask = (taskId: number) => {
-    setTasks(tasks.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task)))
-  }
+    setTasks(
+      tasks.map(task =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task,
+      ),
+    );
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ type: "spring", stiffness: 100, damping: 15 }}
+      transition={{ type: 'spring', stiffness: 100, damping: 15 }}
       className="w-[480px] min-h-[320px] p-4 bg-background text-foreground"
     >
       <div className="flex items-center justify-between mb-4">
@@ -61,23 +79,23 @@ export default function Popup() {
       </div>
 
       <div className="flex space-x-2 mb-4">
-        {["timer", "stats", "tasks", "settings"].map((tab) => (
+        {['timer', 'stats', 'tasks', 'settings'].map(tab => (
           <Button
             key={tab}
-            variant={activeTab === tab ? "default" : "ghost"}
+            variant={activeTab === tab ? 'default' : 'ghost'}
             onClick={() => setActiveTab(tab)}
             className="flex-1 py-1.5"
           >
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               className="flex items-center justify-center w-full"
             >
-              {tab === "timer" && <Clock10 className="w-4 h-4 mr-2" />}
-              {tab === "stats" && <BarChart2 className="w-4 h-4 mr-2" />}
-              {tab === "tasks" && <List className="w-4 h-4 mr-2" />}
-              {tab === "settings" && <Settings className="w-4 h-4 mr-2" />}
+              {tab === 'timer' && <Clock10 className="w-4 h-4 mr-2" />}
+              {tab === 'stats' && <BarChart2 className="w-4 h-4 mr-2" />}
+              {tab === 'tasks' && <List className="w-4 h-4 mr-2" />}
+              {tab === 'settings' && <Settings className="w-4 h-4 mr-2" />}
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </motion.div>
           </Button>
@@ -86,17 +104,22 @@ export default function Popup() {
 
       <div className="min-h-[220px] flex items-center justify-center">
         <AnimatePresence mode="wait">
-          {activeTab === "timer" && (
+          {activeTab === 'timer' && (
             <motion.div
               key="timer"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              transition={{ type: 'spring', stiffness: 100, damping: 15 }}
               className="w-full text-center"
             >
-              <div className="text-5xl font-bold mb-4 tabular-nums">{formatTime(timeRemaining)}</div>
-              <Progress value={(1 - timeRemaining / (25 * 60)) * 100} className="mb-4 w-full" />
+              <div className="text-5xl font-bold mb-4 tabular-nums">
+                {formatTime(timeRemaining)}
+              </div>
+              <Progress
+                value={(1 - timeRemaining / (25 * 60)) * 100}
+                className="mb-4 w-full"
+              />
               {!timerStarted ? (
                 <Button onClick={startTimer} className="w-full py-2">
                   <Play className="w-4 h-4 mr-2" />
@@ -104,11 +127,22 @@ export default function Popup() {
                 </Button>
               ) : (
                 <div className="flex space-x-2">
-                  <Button onClick={() => setTimerRunning(!timerRunning)} className="flex-1 py-2">
-                    {timerRunning ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-                    {timerRunning ? "Pause" : "Resume"}
+                  <Button
+                    onClick={() => setTimerRunning(!timerRunning)}
+                    className="flex-1 py-2"
+                  >
+                    {timerRunning ? (
+                      <Pause className="w-4 h-4 mr-2" />
+                    ) : (
+                      <Play className="w-4 h-4 mr-2" />
+                    )}
+                    {timerRunning ? 'Pause' : 'Resume'}
                   </Button>
-                  <Button onClick={resetTimer} variant="ghost" className="flex-1 py-2">
+                  <Button
+                    onClick={resetTimer}
+                    variant="ghost"
+                    className="flex-1 py-2"
+                  >
                     <RotateCcw className="w-4 h-4 mr-2" />
                     Reset
                   </Button>
@@ -117,28 +151,34 @@ export default function Popup() {
             </motion.div>
           )}
 
-          {activeTab === "stats" && (
+          {activeTab === 'stats' && (
             <motion.div
               key="stats"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              transition={{ type: 'spring', stiffness: 100, damping: 15 }}
               className="w-full"
             >
               <div className="grid gap-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="border rounded-lg p-3">
-                    <div className="text-xs text-muted-foreground">Today's Focus Time</div>
+                    <div className="text-xs text-muted-foreground">
+                      Today's Focus Time
+                    </div>
                     <div className="text-xl font-bold mt-1">2h 15m</div>
                   </div>
                   <div className="border rounded-lg p-3">
-                    <div className="text-xs text-muted-foreground">Weekly Total</div>
+                    <div className="text-xs text-muted-foreground">
+                      Weekly Total
+                    </div>
                     <div className="text-xl font-bold mt-1">12h 30m</div>
                   </div>
                 </div>
                 <div className="border rounded-lg p-3">
-                  <div className="text-xs text-muted-foreground mb-2">Focus Sessions</div>
+                  <div className="text-xs text-muted-foreground mb-2">
+                    Focus Sessions
+                  </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Today's Sessions</span>
@@ -157,24 +197,29 @@ export default function Popup() {
               </div>
             </motion.div>
           )}
-          {activeTab === "tasks" && (
+          {activeTab === 'tasks' && (
             <motion.div
               key="tasks"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              transition={{ type: 'spring', stiffness: 100, damping: 15 }}
               className="w-full"
             >
               <div className="space-y-2">
-                {tasks.map((task) => (
+                {tasks.map(task => (
                   <motion.div
                     key={task.id}
                     className="flex items-center space-x-2 p-2 border rounded-lg"
                     whileHover={{ scale: 1.01 }}
                   >
-                    <Checkbox checked={task.completed} onCheckedChange={() => toggleTask(task.id)} />
-                    <span className={`text-sm ${task.completed ? "line-through text-muted-foreground" : ""}`}>
+                    <Checkbox
+                      checked={task.completed}
+                      onCheckedChange={() => toggleTask(task.id)}
+                    />
+                    <span
+                      className={`text-sm ${task.completed ? 'line-through text-muted-foreground' : ''}`}
+                    >
                       {task.text}
                     </span>
                   </motion.div>
@@ -187,16 +232,21 @@ export default function Popup() {
             </motion.div>
           )}
 
-          {activeTab === "settings" && (
+          {activeTab === 'settings' && (
             <motion.div
               key="settings"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              transition={{ type: 'spring', stiffness: 100, damping: 15 }}
               className="w-full space-y-3"
             >
-              {["Block distracting sites", "Dark mode", "Notifications", "Sound alerts"].map((setting) => (
+              {[
+                'Block distracting sites',
+                'Dark mode',
+                'Notifications',
+                'Sound alerts',
+              ].map(setting => (
                 <motion.div
                   key={setting}
                   className="flex items-center justify-between"
@@ -212,5 +262,5 @@ export default function Popup() {
         </AnimatePresence>
       </div>
     </motion.div>
-  )
+  );
 }
