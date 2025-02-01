@@ -1,8 +1,10 @@
 @import 'tailwindcss';
 
 body {
-  width: 300px;
-  height: 400px;
+  width: 475px;
+  height: 325px;
   margin: 0;
   font-family: system-ui, sans-serif;
+  border-radius: 16px;
+  overflow:hidden
 }
