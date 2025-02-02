@@ -34,7 +34,7 @@ const Chatbot: React.FC = () => {
         {
           method: "POST",
           headers: {
-            Authorization: ``, // Replace with your API key
+            Authorization: `Bearer hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ inputs: input }), // Send user input
