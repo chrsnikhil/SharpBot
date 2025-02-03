@@ -1,62 +1,67 @@
-import React, { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot } from 'lucide-react';
-import { Button } from "./ui/button";
+import { Button } from './ui/button';
+import OpenAI from 'openai';
 
 interface Message {
   text: string;
-  sender: "user" | "bot";
+  sender: 'user' | 'bot';
 }
+
+const openai = new OpenAI({
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: import.meta.env.VITE_LLM_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
 
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
-    { text: "Hello! How can I assist you today?", sender: "bot" },
+    { text: 'Hello! How can I assist you today?', sender: 'bot' },
   ]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(scrollToBottom, [messages]);
 
   const sendMessage = async () => {
-    if (input.trim() === "") return;
-    const newMessage: Message = { text: input, sender: "user" };
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-    setInput(""); // Clear input field
+    if (input.trim() === '') return;
+    const newMessage: Message = { text: input, sender: 'user' };
+    setMessages(prevMessages => [...prevMessages, newMessage]);
+    setInput(''); // Clear input field
 
-    // Call the Hugging Face API for sentiment analysis
     try {
-      const response = await fetch(
-        "https://api-inference.huggingface.co/models/cardiffnlp/twitter-roberta-base-sentiment-latest",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`,
-            "Content-Type": "application/json",
+      const response = await openai.chat.completions.create({
+        model: 'deepseek/deepseek-r1:free',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant.',
           },
-          body: JSON.stringify({ inputs: input }), // Send user input
-        }
-      );
+          {
+            role: 'user',
+            content: input,
+          },
+        ],
+      });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-      // Check the structure of the response
-      console.log(data); // Log the response to see its structure
-
-      // Extract the sentiment label
-      const sentiment = data[0]?.label; // Adjust based on the API response structure
-      const botResponse: Message = { text: `Sentiment: ${sentiment}`, sender: "bot" };
-      setMessages((prevMessages) => [...prevMessages, botResponse]);
+      const sentiment = response.choices[0].message.content;
+      const botResponse: Message = {
+        text: sentiment ?? '',
+        sender: 'bot',
+      };
+      setMessages(prevMessages => [...prevMessages, botResponse]);
     } catch (error) {
-      console.error("Error fetching response from Hugging Face API:", error);
-      const errorMessage: Message = { text: "Sorry, I couldn't process your request.", sender: "bot" };
-      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+      console.error('Error fetching response from OpenRouter API:', error);
+      const errorMessage: Message = {
+        text: "Sorry, I couldn't process your request.",
+        sender: 'bot',
+      };
+      setMessages(prevMessages => [...prevMessages, errorMessage]);
     }
   };
 
@@ -75,13 +80,13 @@ const Chatbot: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+              className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
                 className={`max-w-[80%] p-3 rounded-lg ${
-                  msg.sender === "user"
-                    ? "bg-black text-white rounded-br-none"
-                    : "bg-gray-200 text-black rounded-bl-none"
+                  msg.sender === 'user'
+                    ? 'bg-black text-white rounded-br-none'
+                    : 'bg-gray-200 text-black rounded-bl-none'
                 }`}
               >
                 {msg.text}
@@ -93,7 +98,7 @@ const Chatbot: React.FC = () => {
       </div>
       <div className="p-4 bg-white border-t">
         <form
-          onSubmit={(e) => {
+          onSubmit={e => {
             e.preventDefault();
             sendMessage();
           }}
@@ -102,11 +107,14 @@ const Chatbot: React.FC = () => {
           <input
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={e => setInput(e.target.value)}
             placeholder="Type a message..."
             className="flex-grow p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
           />
-          <Button type="submit" className="bg-black text-white hover:bg-gray-800">
+          <Button
+            type="submit"
+            className="bg-black text-white hover:bg-gray-800"
+          >
             <Send className="w-4 h-4 mr-2" />
             Send
           </Button>
